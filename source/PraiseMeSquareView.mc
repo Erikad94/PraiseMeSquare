@@ -9,6 +9,9 @@ class PraiseMeSquareView extends WatchUi.WatchFace {
 
     var mode   = "dominant";
     var gender = "female";
+    var praiseColor = 0xd61ad6;
+    var firstColor = 0x44F9FF;
+    var accentColor = 0xFF29FF;
 
     function initialize() {  WatchFace.initialize(); }
     function onLayout(dc as Dc) as Void { }
@@ -42,9 +45,17 @@ class PraiseMeSquareView extends WatchUi.WatchFace {
 
     function onUpdate(dc as Dc) as Void 
     {
+        var profile = UserProfile.getProfile();
+        var gender = profile.gender;
+
+        if (gender == UserProfile.GENDER_MALE) {
+            gender = "male";
+        }
+
         UpdateModeForDate();
-        var smallFont =  WatchUi.loadResource( Rez.Fonts.WeatherFont );
-        var wordFont =  WatchUi.loadResource( Rez.Fonts.smallFont );
+        var smallFont =  WatchUi.loadResource( Rez.Fonts.WeatherFont);
+        var wordFont =  WatchUi.loadResource( Rez.Fonts.smallFont);
+        var praiseFont = WatchUi.loadResource( Rez.Fonts.praiseFont);
         var mySettings = System.getDeviceSettings();
 
         View.onUpdate(dc);
@@ -63,18 +74,21 @@ class PraiseMeSquareView extends WatchUi.WatchFace {
         var textOffsetTopLine = 0;
         var textOffsetMidLine = 25;
         var textOffsetBottomLine = 50;
-        var praiseColor = 0xd61ad6;
         
         dc.setColor(praiseColor, Graphics.COLOR_TRANSPARENT);
 
         var lines = [];
         for (var i = 0; i < 3; i++) {
             var line = praiseText[i];
-            if (line == null || line.length() == 0) { break; }
+            if (line == null || line.length() == 0) 
+            { 
+                break; 
+            }
             lines.add(line);
         }
 
-        if (lines.size() > 0) {
+        if (lines.size() > 0) 
+        {
             offsetTimeForPraise = 30;
             offsetTopIconsForPraise = 20;
             offsetBottomIconsForPraise = 20;
@@ -82,26 +96,26 @@ class PraiseMeSquareView extends WatchUi.WatchFace {
             if (lines.size() == 1) 
             {
                 textOffsetTopLine = 25;
-                dc.drawText(centerX, centerY + textOffsetTopLine, Graphics.FONT_XTINY, lines[0], Graphics.TEXT_JUSTIFY_CENTER);
+                dc.drawText(centerX, centerY + textOffsetTopLine, wordFont, lines[0], Graphics.TEXT_JUSTIFY_CENTER);
             } 
             else if (lines.size() == 2) 
             {
                 textOffsetTopLine = 10;
                 textOffsetMidLine = 40;
 
-                dc.drawText(centerX, centerY + textOffsetTopLine, Graphics.FONT_XTINY, lines[0], Graphics.TEXT_JUSTIFY_CENTER);
-                dc.drawText(centerX, centerY + textOffsetMidLine, Graphics.FONT_XTINY, lines[1], Graphics.TEXT_JUSTIFY_CENTER);
+                dc.drawText(centerX, centerY + textOffsetTopLine, wordFont, lines[0], Graphics.TEXT_JUSTIFY_CENTER);
+                dc.drawText(centerX, centerY + textOffsetMidLine, wordFont, lines[1], Graphics.TEXT_JUSTIFY_CENTER);
             } 
             else if (lines.size() == 3) 
             {
-                textOffsetTopLine = -10;
-                textOffsetMidLine = 20;
+                textOffsetTopLine = 0;
+                textOffsetMidLine = 25;
                 textOffsetBottomLine = 50;
                 offsetTimeForPraise = 40;
 
-                dc.drawText(centerX, centerY + textOffsetTopLine, Graphics.FONT_XTINY, lines[0], Graphics.TEXT_JUSTIFY_CENTER);
-                dc.drawText(centerX, centerY + textOffsetMidLine, Graphics.FONT_XTINY, lines[1], Graphics.TEXT_JUSTIFY_CENTER);
-                dc.drawText(centerX, centerY + textOffsetBottomLine, Graphics.FONT_XTINY, lines[2], Graphics.TEXT_JUSTIFY_CENTER);
+                dc.drawText(centerX, centerY + textOffsetTopLine, wordFont, lines[0], Graphics.TEXT_JUSTIFY_CENTER);
+                dc.drawText(centerX, centerY + textOffsetMidLine, wordFont, lines[1], Graphics.TEXT_JUSTIFY_CENTER);
+                dc.drawText(centerX, centerY + textOffsetBottomLine, wordFont, lines[2], Graphics.TEXT_JUSTIFY_CENTER);
             }
         }
 
@@ -117,13 +131,14 @@ class PraiseMeSquareView extends WatchUi.WatchFace {
 
     private function SetRectangles(dc as Dc, mySettings as Toybox.System.DeviceSettings) 
     {
-        if (mySettings.screenShape != 1){
+        if (mySettings.screenShape != 1)
+        {
             var ExactY = (dc.getHeight());
             var ExactX = (dc.getWidth());
             dc.setPenWidth(7);    
-            dc.setColor(0xFF29FF, Graphics.COLOR_TRANSPARENT);        
+            dc.setColor(accentColor, Graphics.COLOR_TRANSPARENT);        
             dc.drawRectangle(0,0, ExactX, ExactY) ;
-            dc.setColor(0x44F9FF, Graphics.COLOR_TRANSPARENT);        
+            dc.setColor(firstColor, Graphics.COLOR_TRANSPARENT);        
             dc.drawRectangle(10,10, ExactX-20, ExactY-20) ; 
         }
     }
@@ -134,7 +149,7 @@ class PraiseMeSquareView extends WatchUi.WatchFace {
         var monthArray = ["Month", "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"] as Array<String>;
         var today = Time.Gregorian.info(Time.now(), Time.FORMAT_SHORT);
 
-        dc.setColor(0x44F9FF, Graphics.COLOR_TRANSPARENT);  
+        dc.setColor(firstColor, Graphics.COLOR_TRANSPARENT);  
         dc.drawText(centerX,30,wordFont,(weekdayArray[today.day_of_week]+" , "+ monthArray[today.month]+" "+ today.day +" " +today.year), Graphics.TEXT_JUSTIFY_CENTER );
     }
 
@@ -146,9 +161,9 @@ class PraiseMeSquareView extends WatchUi.WatchFace {
         var timeString = Lang.format(timeFormat, [hours, clockTime.min.format("%02d")]);
         var timeFont =  WatchUi.loadResource( Rez.Fonts.timeFont );
 
-        dc.setColor(0xFF00AA, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(accentColor, Graphics.COLOR_TRANSPARENT);
         dc.drawText(centerX + 3, centerY-43-offsetForPraise, timeFont, timeString, Graphics.TEXT_JUSTIFY_CENTER);
-        dc.setColor(0x00FFFF, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(firstColor, Graphics.COLOR_TRANSPARENT);
         dc.drawText(centerX, centerY-45-offsetForPraise, timeFont, timeString, Graphics.TEXT_JUSTIFY_CENTER);
     }
 
@@ -182,11 +197,11 @@ class PraiseMeSquareView extends WatchUi.WatchFace {
             userCAL = info.calories.toNumber();
         } 
 
-        dc.setColor(0x44F9FF, Graphics.COLOR_TRANSPARENT); 
+        dc.setColor(firstColor, Graphics.COLOR_TRANSPARENT); 
         dc.drawText( centerX-(centerX/2), centerY-(centerY/2)-offsetForPraise, wordFont,  (" "+userCAL), Graphics.TEXT_JUSTIFY_LEFT );
-        dc.setColor(0xFF00AA, Graphics.COLOR_TRANSPARENT);  
+        dc.setColor(accentColor, Graphics.COLOR_TRANSPARENT);  
         dc.drawText( centerX-(centerX/2)+1,  centerY-(centerY/2)+6-offsetForPraise, wordFont,  (" ~ "), Graphics.TEXT_JUSTIFY_RIGHT );
-        dc.setColor(0x44F9FF, Graphics.COLOR_TRANSPARENT);  
+        dc.setColor(firstColor, Graphics.COLOR_TRANSPARENT);  
         dc.drawText( centerX-(centerX/2),  centerY-(centerY/2)+5-offsetForPraise, wordFont,  (" ~ "), Graphics.TEXT_JUSTIFY_RIGHT );
     }
 
@@ -199,11 +214,11 @@ class PraiseMeSquareView extends WatchUi.WatchFace {
             userSTEPS = info.steps.toNumber();
         }
 
-        dc.setColor(0x44F9FF, Graphics.COLOR_TRANSPARENT); 
+        dc.setColor(firstColor, Graphics.COLOR_TRANSPARENT); 
         dc.drawText( centerX+(centerX/2)-20,  centerY-(centerY/2)-offsetForPraise, wordFont,  (" "+userSTEPS), Graphics.TEXT_JUSTIFY_LEFT);
-        dc.setColor(0xFF00AA, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(accentColor, Graphics.COLOR_TRANSPARENT);
         dc.drawText( centerX+(centerX/2)-20+1,  centerY-(centerY/2)+6-offsetForPraise, wordFont,  (" ^ "), Graphics.TEXT_JUSTIFY_RIGHT );
-        dc.setColor(0x44F9FF, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(firstColor, Graphics.COLOR_TRANSPARENT);
         dc.drawText( centerX+(centerX/2)-20,  centerY-(centerY/2)+5-offsetForPraise, wordFont,  (" ^ "), Graphics.TEXT_JUSTIFY_RIGHT );
     }
 
@@ -251,11 +266,11 @@ class PraiseMeSquareView extends WatchUi.WatchFace {
             cond = 0;
         }
 
-        dc.setColor(0xFF00AA, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(accentColor, Graphics.COLOR_TRANSPARENT);
         dc.drawText( centerX-(centerX/2)+1,  centerY+(centerY/2)-4-20+offsetForPraise, smallFont, weather(cond), Graphics.TEXT_JUSTIFY_RIGHT );
-        dc.setColor(0x44F9FF, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(firstColor, Graphics.COLOR_TRANSPARENT);
         dc.drawText( centerX-(centerX/2),  centerY+(centerY/2)-5-20+offsetForPraise, smallFont, weather(cond), Graphics.TEXT_JUSTIFY_RIGHT );
-        dc.setColor(0x44F9FF, Graphics.COLOR_TRANSPARENT); 
+        dc.setColor(firstColor, Graphics.COLOR_TRANSPARENT); 
         dc.drawText( centerX-(centerX/2)+10,  centerY+(centerY/2)-20+offsetForPraise, wordFont, (TEMP+" " +FC), Graphics.TEXT_JUSTIFY_LEFT );
     }
 
@@ -264,11 +279,11 @@ class PraiseMeSquareView extends WatchUi.WatchFace {
         var numberNotify = 0;
         if (mySettings.notificationCount != null){numberNotify = mySettings.notificationCount.toNumber();}
 
-        dc.setColor(0x44F9FF, Graphics.COLOR_TRANSPARENT);  
+        dc.setColor(firstColor, Graphics.COLOR_TRANSPARENT);  
         dc.drawText(centerX+(centerX/2)-20,  centerY+(centerY/2)-20+offsetForPraise, wordFont,(" "+numberNotify),Graphics.TEXT_JUSTIFY_LEFT);
-        dc.setColor(0xFF00AA, Graphics.COLOR_TRANSPARENT); 
+        dc.setColor(accentColor, Graphics.COLOR_TRANSPARENT); 
         dc.drawText(centerX+(centerX/2)-20+1,  centerY+(centerY/2)-4-20+offsetForPraise, wordFont,  (" # "),Graphics.TEXT_JUSTIFY_RIGHT);
-        dc.setColor(0x44F9FF, Graphics.COLOR_TRANSPARENT); 
+        dc.setColor(firstColor, Graphics.COLOR_TRANSPARENT); 
         dc.drawText(centerX+(centerX/2)-20,  centerY+(centerY/2)-5-20+offsetForPraise, wordFont,  (" # "),Graphics.TEXT_JUSTIFY_RIGHT);
     }
 
@@ -281,11 +296,11 @@ class PraiseMeSquareView extends WatchUi.WatchFace {
             batteryMeter = myStats.battery.toNumber();
         }
 
-        dc.setColor(0x44F9FF, Graphics.COLOR_TRANSPARENT); 
+        dc.setColor(firstColor, Graphics.COLOR_TRANSPARENT); 
         dc.drawText( centerX, centerY+(centerY/1.5)+12, wordFont,  (batteryMeter+"%"), Graphics.TEXT_JUSTIFY_LEFT );
-        dc.setColor(0xFF00AA, Graphics.COLOR_TRANSPARENT); 
+        dc.setColor(accentColor, Graphics.COLOR_TRANSPARENT); 
         dc.drawText( centerX+1 , centerY+(centerY/1.5)+11, wordFont,  " [ ", Graphics.TEXT_JUSTIFY_RIGHT );
-        dc.setColor(0x44F9FF, Graphics.COLOR_TRANSPARENT); 
+        dc.setColor(firstColor, Graphics.COLOR_TRANSPARENT); 
         dc.drawText( centerX, centerY+(centerY/1.5)+10, wordFont,  " [ ", Graphics.TEXT_JUSTIFY_RIGHT );
     }
 
