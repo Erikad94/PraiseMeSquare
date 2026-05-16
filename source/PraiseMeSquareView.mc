@@ -1,4 +1,5 @@
 import Toybox.Application;
+import Toybox.Application.Properties;
 import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.System;
@@ -6,32 +7,111 @@ import Toybox.WatchUi;
 
 class PraiseMeSquareView extends WatchUi.WatchFace {
 
+    var mode   = "dominant";
+    var gender = "female";
+
     function initialize() {  WatchFace.initialize(); }
     function onLayout(dc as Dc) as Void { }
-    function onShow() as Void { }
+
+    function onShow() as Void {
+        UpdateModeForDate();
+    }
+
+    function UpdateModeForDate() as Void {
+        var today = Time.Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+        if (today.day_of_week == 1) {
+            mode = "dominant";
+        } else if (today.day_of_week == 2) {
+            mode = "flirty";
+        } else if (today.day_of_week == 3) {
+            mode = "chaotic";
+        } else if (today.day_of_week == 4) {
+            mode = "degrading";
+        } else if (today.day_of_week == 5) {
+            mode = "flirty";
+        } else if (today.day_of_week == 6) {
+            mode = "chaotic";
+        } else if (today.day_of_week == 7) {
+            mode = "dominant";
+        }
+    }
+
     function onHide() as Void { }
     function onExitSleep() as Void {}
     function onEnterSleep() as Void {}
 
     function onUpdate(dc as Dc) as Void 
     {
+        UpdateModeForDate();
         var smallFont =  WatchUi.loadResource( Rez.Fonts.WeatherFont );
         var wordFont =  WatchUi.loadResource( Rez.Fonts.smallFont );
         var mySettings = System.getDeviceSettings();
+
+        View.onUpdate(dc);
 
         //anchors
         var centerX = (dc.getWidth()) / 2;
         var centerY = (dc.getHeight()) / 2;
 
-        View.onUpdate(dc);
+        var steps    = 0;
+        var info = ActivityMonitor.getInfo();
+            if (info != null && info.steps    != null) { steps    = info.steps; }
+        var praiseText = GetPraise(steps.toNumber());
+        var offsetTimeForPraise = 0;
+        var offsetTopIconsForPraise = 0;
+        var offsetBottomIconsForPraise = 0;
+        var textOffsetTopLine = 0;
+        var textOffsetMidLine = 25;
+        var textOffsetBottomLine = 50;
+        var praiseColor = 0xd61ad6;
+        
+        dc.setColor(praiseColor, Graphics.COLOR_TRANSPARENT);
+
+        var lines = [];
+        for (var i = 0; i < 3; i++) {
+            var line = praiseText[i];
+            if (line == null || line.length() == 0) { break; }
+            lines.add(line);
+        }
+
+        if (lines.size() > 0) {
+            offsetTimeForPraise = 30;
+            offsetTopIconsForPraise = 20;
+            offsetBottomIconsForPraise = 20;
+
+            if (lines.size() == 1) 
+            {
+                textOffsetTopLine = 25;
+                dc.drawText(centerX, centerY + textOffsetTopLine, Graphics.FONT_XTINY, lines[0], Graphics.TEXT_JUSTIFY_CENTER);
+            } 
+            else if (lines.size() == 2) 
+            {
+                textOffsetTopLine = 10;
+                textOffsetMidLine = 40;
+
+                dc.drawText(centerX, centerY + textOffsetTopLine, Graphics.FONT_XTINY, lines[0], Graphics.TEXT_JUSTIFY_CENTER);
+                dc.drawText(centerX, centerY + textOffsetMidLine, Graphics.FONT_XTINY, lines[1], Graphics.TEXT_JUSTIFY_CENTER);
+            } 
+            else if (lines.size() == 3) 
+            {
+                textOffsetTopLine = -10;
+                textOffsetMidLine = 20;
+                textOffsetBottomLine = 50;
+                offsetTimeForPraise = 40;
+
+                dc.drawText(centerX, centerY + textOffsetTopLine, Graphics.FONT_XTINY, lines[0], Graphics.TEXT_JUSTIFY_CENTER);
+                dc.drawText(centerX, centerY + textOffsetMidLine, Graphics.FONT_XTINY, lines[1], Graphics.TEXT_JUSTIFY_CENTER);
+                dc.drawText(centerX, centerY + textOffsetBottomLine, Graphics.FONT_XTINY, lines[2], Graphics.TEXT_JUSTIFY_CENTER);
+            }
+        }
 
         SetRectangles(dc, mySettings);
         SetMonthDisplay(dc, centerX, centerY, wordFont);
-        SetTimeDisplay(dc, centerX, centerY);
-        SetCaloriesDisplay(dc, wordFont, centerX, centerY);
-        SetStepsDisplay(dc, wordFont, centerX, centerY);
-        SetWeatherDisplay(dc, smallFont, wordFont, centerX, centerY);
-        SetNotificationsDisplay(dc, wordFont, centerX, centerY, mySettings);
+        SetTimeDisplay(dc, centerX, centerY, offsetTimeForPraise);
+        SetCaloriesDisplay(dc, wordFont, centerX, centerY, offsetTopIconsForPraise);
+        SetStepsDisplay(dc, wordFont, centerX, centerY, offsetTopIconsForPraise);
+        SetWeatherDisplay(dc, smallFont, wordFont, centerX, centerY, offsetBottomIconsForPraise);
+        SetNotificationsDisplay(dc, wordFont, centerX, centerY, mySettings, offsetBottomIconsForPraise);
         SetBatteryDisplay(dc, wordFont, centerX, centerY);
     }
 
@@ -58,7 +138,7 @@ class PraiseMeSquareView extends WatchUi.WatchFace {
         dc.drawText(centerX,30,wordFont,(weekdayArray[today.day_of_week]+" , "+ monthArray[today.month]+" "+ today.day +" " +today.year), Graphics.TEXT_JUSTIFY_CENTER );
     }
 
-    private function SetTimeDisplay(dc as Dc, centerX as Number, centerY as Number) 
+    private function SetTimeDisplay(dc as Dc, centerX as Number, centerY as Number, offsetForPraise as Number) 
     {
         var timeFormat = "$1$:$2$";
         var clockTime = System.getClockTime();
@@ -67,9 +147,9 @@ class PraiseMeSquareView extends WatchUi.WatchFace {
         var timeFont =  WatchUi.loadResource( Rez.Fonts.timeFont );
 
         dc.setColor(0xFF00AA, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(centerX + 3, centerY-43, timeFont, timeString, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(centerX + 3, centerY-43-offsetForPraise, timeFont, timeString, Graphics.TEXT_JUSTIFY_CENTER);
         dc.setColor(0x00FFFF, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(centerX, centerY-45, timeFont, timeString, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(centerX, centerY-45-offsetForPraise, timeFont, timeString, Graphics.TEXT_JUSTIFY_CENTER);
     }
 
     // Heart rate is not currently being used in the watch face, but this function can be used to retrieve the current heart rate if you want to add it in the future
@@ -93,7 +173,7 @@ class PraiseMeSquareView extends WatchUi.WatchFace {
         // You can use the heartRate variable to display the heart rate on the watch face if desired
     }
 
-    private function SetCaloriesDisplay(dc as Dc, wordFont as Graphics.FontType, centerX as Number, centerY as Number) 
+    private function SetCaloriesDisplay(dc as Dc, wordFont as Graphics.FontType, centerX as Number, centerY as Number, offsetForPraise as Number) 
     {
         var userCAL = 0;
         var info = ActivityMonitor.getInfo();
@@ -103,14 +183,14 @@ class PraiseMeSquareView extends WatchUi.WatchFace {
         } 
 
         dc.setColor(0x44F9FF, Graphics.COLOR_TRANSPARENT); 
-        dc.drawText( centerX-(centerX/2), centerY-(centerY/2), wordFont,  (" "+userCAL), Graphics.TEXT_JUSTIFY_LEFT );
+        dc.drawText( centerX-(centerX/2), centerY-(centerY/2)-offsetForPraise, wordFont,  (" "+userCAL), Graphics.TEXT_JUSTIFY_LEFT );
         dc.setColor(0xFF00AA, Graphics.COLOR_TRANSPARENT);  
-        dc.drawText( centerX-(centerX/2)+1,  centerY-(centerY/2)+6, wordFont,  (" ~ "), Graphics.TEXT_JUSTIFY_RIGHT );
+        dc.drawText( centerX-(centerX/2)+1,  centerY-(centerY/2)+6-offsetForPraise, wordFont,  (" ~ "), Graphics.TEXT_JUSTIFY_RIGHT );
         dc.setColor(0x44F9FF, Graphics.COLOR_TRANSPARENT);  
-        dc.drawText( centerX-(centerX/2),  centerY-(centerY/2)+5, wordFont,  (" ~ "), Graphics.TEXT_JUSTIFY_RIGHT );
+        dc.drawText( centerX-(centerX/2),  centerY-(centerY/2)+5-offsetForPraise, wordFont,  (" ~ "), Graphics.TEXT_JUSTIFY_RIGHT );
     }
 
-    private function SetStepsDisplay(dc as Dc, wordFont as Graphics.FontType, centerX as Number, centerY as Number) 
+    private function SetStepsDisplay(dc as Dc, wordFont as Graphics.FontType, centerX as Number, centerY as Number, offsetForPraise as Number) 
     {
         var userSTEPS = 0;
         var info = ActivityMonitor.getInfo();
@@ -120,11 +200,11 @@ class PraiseMeSquareView extends WatchUi.WatchFace {
         }
 
         dc.setColor(0x44F9FF, Graphics.COLOR_TRANSPARENT); 
-        dc.drawText( centerX+(centerX/2)-20,  centerY-(centerY/2), wordFont,  (" "+userSTEPS), Graphics.TEXT_JUSTIFY_LEFT);
+        dc.drawText( centerX+(centerX/2)-20,  centerY-(centerY/2)-offsetForPraise, wordFont,  (" "+userSTEPS), Graphics.TEXT_JUSTIFY_LEFT);
         dc.setColor(0xFF00AA, Graphics.COLOR_TRANSPARENT);
-        dc.drawText( centerX+(centerX/2)-20+1,  centerY-(centerY/2)+6, wordFont,  (" ^ "), Graphics.TEXT_JUSTIFY_RIGHT );
+        dc.drawText( centerX+(centerX/2)-20+1,  centerY-(centerY/2)+6-offsetForPraise, wordFont,  (" ^ "), Graphics.TEXT_JUSTIFY_RIGHT );
         dc.setColor(0x44F9FF, Graphics.COLOR_TRANSPARENT);
-        dc.drawText( centerX+(centerX/2)-20,  centerY-(centerY/2)+5, wordFont,  (" ^ "), Graphics.TEXT_JUSTIFY_RIGHT );
+        dc.drawText( centerX+(centerX/2)-20,  centerY-(centerY/2)+5-offsetForPraise, wordFont,  (" ^ "), Graphics.TEXT_JUSTIFY_RIGHT );
     }
 
     function weather(cond) 
@@ -138,7 +218,7 @@ class PraiseMeSquareView extends WatchUi.WatchFace {
         else {return "c";}//suncloudrain 
     }
 
-    private function SetWeatherDisplay(dc as Dc, smallFont as Graphics.FontType, wordFont as Graphics.FontType, centerX as Number, centerY as Number) 
+    private function SetWeatherDisplay(dc as Dc, smallFont as Graphics.FontType, wordFont as Graphics.FontType, centerX as Number, centerY as Number, offsetForPraise as Number) 
     {
         var getCC = Toybox.Weather.getCurrentConditions();
         var TEMP = "000";
@@ -172,24 +252,24 @@ class PraiseMeSquareView extends WatchUi.WatchFace {
         }
 
         dc.setColor(0xFF00AA, Graphics.COLOR_TRANSPARENT);
-        dc.drawText( centerX-(centerX/2)+1,  centerY+(centerY/2)-4-20, smallFont, weather(cond), Graphics.TEXT_JUSTIFY_RIGHT );
+        dc.drawText( centerX-(centerX/2)+1,  centerY+(centerY/2)-4-20+offsetForPraise, smallFont, weather(cond), Graphics.TEXT_JUSTIFY_RIGHT );
         dc.setColor(0x44F9FF, Graphics.COLOR_TRANSPARENT);
-        dc.drawText( centerX-(centerX/2),  centerY+(centerY/2)-5-20, smallFont, weather(cond), Graphics.TEXT_JUSTIFY_RIGHT );
+        dc.drawText( centerX-(centerX/2),  centerY+(centerY/2)-5-20+offsetForPraise, smallFont, weather(cond), Graphics.TEXT_JUSTIFY_RIGHT );
         dc.setColor(0x44F9FF, Graphics.COLOR_TRANSPARENT); 
-        dc.drawText( centerX-(centerX/2)+10,  centerY+(centerY/2)-20, wordFont, (TEMP+" " +FC), Graphics.TEXT_JUSTIFY_LEFT );
+        dc.drawText( centerX-(centerX/2)+10,  centerY+(centerY/2)-20+offsetForPraise, wordFont, (TEMP+" " +FC), Graphics.TEXT_JUSTIFY_LEFT );
     }
 
-    private function SetNotificationsDisplay(dc as Dc, wordFont as Graphics.FontType, centerX as Number, centerY as Number, mySettings as Toybox.System.DeviceSettings) 
+    private function SetNotificationsDisplay(dc as Dc, wordFont as Graphics.FontType, centerX as Number, centerY as Number, mySettings as Toybox.System.DeviceSettings, offsetForPraise as Number) 
     {
         var numberNotify = 0;
         if (mySettings.notificationCount != null){numberNotify = mySettings.notificationCount.toNumber();}
 
         dc.setColor(0x44F9FF, Graphics.COLOR_TRANSPARENT);  
-        dc.drawText(centerX+(centerX/2)-20,  centerY+(centerY/2)-20, wordFont,(" "+numberNotify),Graphics.TEXT_JUSTIFY_LEFT);
+        dc.drawText(centerX+(centerX/2)-20,  centerY+(centerY/2)-20+offsetForPraise, wordFont,(" "+numberNotify),Graphics.TEXT_JUSTIFY_LEFT);
         dc.setColor(0xFF00AA, Graphics.COLOR_TRANSPARENT); 
-        dc.drawText(centerX+(centerX/2)-20+1,  centerY+(centerY/2)-4-20, wordFont,  (" # "),Graphics.TEXT_JUSTIFY_RIGHT);
+        dc.drawText(centerX+(centerX/2)-20+1,  centerY+(centerY/2)-4-20+offsetForPraise, wordFont,  (" # "),Graphics.TEXT_JUSTIFY_RIGHT);
         dc.setColor(0x44F9FF, Graphics.COLOR_TRANSPARENT); 
-        dc.drawText(centerX+(centerX/2)-20,  centerY+(centerY/2)-5-20, wordFont,  (" # "),Graphics.TEXT_JUSTIFY_RIGHT);
+        dc.drawText(centerX+(centerX/2)-20,  centerY+(centerY/2)-5-20+offsetForPraise, wordFont,  (" # "),Graphics.TEXT_JUSTIFY_RIGHT);
     }
 
     private function SetBatteryDisplay(dc as Dc, wordFont as Graphics.FontType, centerX as Number, centerY as Number) 
@@ -207,5 +287,84 @@ class PraiseMeSquareView extends WatchUi.WatchFace {
         dc.drawText( centerX+1 , centerY+(centerY/1.5)+11, wordFont,  " [ ", Graphics.TEXT_JUSTIFY_RIGHT );
         dc.setColor(0x44F9FF, Graphics.COLOR_TRANSPARENT); 
         dc.drawText( centerX, centerY+(centerY/1.5)+10, wordFont,  " [ ", Graphics.TEXT_JUSTIFY_RIGHT );
+    }
+
+    function GetPetName(steps) {
+        var namesBoy  = ["puppy", "pet", "kitten", "baby boy"];
+        var namesGirl = ["puppy", "pet", "kitten", "baby girl", "princess"];
+        var list  = (gender == "male") ? namesBoy : namesGirl;
+        var index = Math.floor((steps / 1000) % list.size()).toNumber();
+        return list[index];
+    }
+
+    function GetNickName(steps) {
+        var namesBoy  = ["puppy", "pet", "boy"];
+        var namesGirl = ["kitten", "pet", "girl"];
+        var list  = (gender == "male") ? namesBoy : namesGirl;
+        var index = Math.floor((steps / 1000) % list.size()).toNumber();
+        return list[index];
+    }
+
+    function GetDegradingNickname(steps) {
+        var namesBoy  = ["whore", "slut", "princess", "plaything"];
+        var namesGirl = ["whore", "slut", "plaything"];
+        var list  = (gender == "male") ? namesBoy : namesGirl;
+        var index = Math.floor((steps / 1000) % list.size()).toNumber();
+        return list[index];
+    }
+
+    function GetPraise(steps) {
+        var pet = GetPetName(steps);
+        var nick = GetNickName(steps);
+        var degradingNick = GetDegradingNickname(steps);
+
+        if ((Math.rand() % 100) == 0) {
+            if (mode == "dominant")  { return ["...good.","Keep it that way.", ""]; }
+            if (mode == "flirty")    { return ["...mm,","I noticed that.",""]; }
+            if (mode == "chaotic")   { return ["Oh?","That caught my attention.",""]; }
+            if (mode == "degrading") { return ["...finally." ,"Took you long enough,",pet + "."]; }
+        }
+
+        if (mode.equals("flirty")) {
+            if (steps >= 15000) { return ["You really did", "that for me...", "I like it."]; }
+            if (steps >= 12000) { return ["You just keep going.", "don't you?", ""]; }
+            if (steps >= 10000) { return ["10k already?", "Such a good " + nick + ".", ""]; }
+            if (steps >= 7500)  { return ["Trying to impress me,", pet + "?", ""]; }
+            if (steps >= 5000)  { return ["Keep going...", "I'm watching.", ""]; }
+            if (steps >= 2000)  { return ["That's it...", "steady.", ""]; }
+            return ["Don't make me wait...", "", ""];
+        }
+
+        if (mode.equals("chaotic")) {
+            if (steps >= 15000) { return ["Okay WOW--", "this is getting", "out of hand."]; }
+            if (steps >= 12000) { return ["You're actually", "doing this", "huh?"]; }
+            if (steps >= 10000) { return ["Look at you go.", "", ""]; }
+            if (steps >= 7500)  { return ["Oh?", "Now you care?", ""]; }
+            if (steps >= 5000)  { return ["That's...", "something, " + pet + ".", ""]; }
+            if (steps >= 2000)  { return ["Try harder.", "", ""]; }
+            return ["Really?","That's it?",""];
+        }
+
+        if (mode.equals("dominant")) {
+            if (steps >= 15000) { return ["You finished what", "you started.", "Good " + nick + "."]; }
+            if (steps >= 12000) { return ["Keep pushing.", "Don't stop, " + pet + ".", ""]; }
+            if (steps >= 10000) { return ["10k.", "Acceptable.", ""]; }
+            if (steps >= 7500)  { return ["Not done...", "yet.", ""]; }
+            if (steps >= 5000)  { return ["Focus", "", ""]; }
+            if (steps >= 2000)  { return ["Move", "", ""]; }
+            return ["Start. Now", "", ""];
+        }
+
+        if (mode.equals("degrading")) {
+            if (steps >= 15000) { return ["Huh.", "You actually did it.", "Fine, " + pet + "."]; }
+            if (steps >= 12000) { return ["You met expectations.", "Barely.", ""]; }
+            if (steps >= 10000) { return ["10k. Minimum reached,", "good" + degradingNick + ".", ""]; }
+            if (steps >= 7500)  { return ["Still not enough.", "", ""]; }
+            if (steps >= 5000)  { return ["Weak effort.", "", ""]; }
+            if (steps >= 2000)  { return ["Move faster,", "" + degradingNick + ".", ""]; }
+            return ["Embarrassing.", "", ""];
+        }
+
+        return ["", "", ""];
     }
 }

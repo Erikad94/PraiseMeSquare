@@ -1,0 +1,20 @@
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
+
+    <setting propertyKey="@Properties.mode" title="@Strings.modeChoices">
+        <settingConfig type="list">
+            <listEntry value="dominant">@Strings.dominant</listEntry>
+            <listEntry value="flirty">@Strings.flirty</listEntry>
+            <listEntry value="chaotic">@Strings.chaotic</listEntry>
+            <listEntry value="degrading">@Strings.degrading</listEntry>
+        </settingConfig>
+    </setting>
+
+    <setting propertyKey="@Properties.gender" title="@Strings.genderChoices">
+        <settingConfig type="list">
+            <listEntry value="female">@Strings.female</listEntry>
+            <listEntry value="male">@Strings.male</listEntry>
+        </settingConfig>
+    </setting>
+
+</settings>

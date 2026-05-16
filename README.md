@@ -1,4 +1,4 @@
-# Praise Me Venu Sq2 Watch Face
+# Praise Me Garmin Venu Sq2 Watch Face
 
 [<img src="/resources/PraiseMeWatchFace.png" width="200" height="300">](PraiseMe)
 
