@@ -1,4 +1,12 @@
 <strings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
 
     <string id="AppName">PraiseMeRound</string>
+    <string id="modeChoices">Select an Option</string>
+    <string id="dominant">Dominant</string>
+    <string id="flirty">Flirty</string>
+    <string id="chaotic">Chaotic</string>
+    <string id="degrading">Degrading</string>
+    <string id="genderChoices">Select Gender</string>
+    <string id="female">Female</string>
+    <string id="male">Male</string>
 </strings>

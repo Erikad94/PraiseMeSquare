@@ -1,0 +1,6 @@
+<properties>
+
+    <property id="mode" type="string">flirty</property>
+    <property id="gender" type="string">female</property>
+
+</properties>
