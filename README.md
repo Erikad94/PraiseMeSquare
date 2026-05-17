@@ -1,6 +1,6 @@
 # Praise Me Garmin Venu Sq2 Watch Face
 
-[<img src="/resources/PraiseMeWatchFace.png" width="200" height="200">](PraiseMe)
+[<img src="/resources/PraiseMeWatchFace.png" width="300" height="300">](PraiseMe)
 
 ## Stats:
 
