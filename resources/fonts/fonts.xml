@@ -1,6 +1,6 @@
 <fonts>
     <font id="WeatherFont" filename="weatherhoro.fnt" filter="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!#$%{@}=: ^()[?]_%.,-"/>
     <font id="smallFont" filename="small.fnt" filter="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890{}:~ #^$[]@*+_%=~.?,-"/>
-    <font id="praiseFont" filename="PraiseText.fnt" filter="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890{}:~ #^$[]@*+_%=~.?,-"/>
+    <font id="praiseFont" filename="Praise.fnt" filter="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890{}:~ #^$[]@*+_%=~.?,-'"/>
     <font id="timeFont" filename="rubik_big.fnt" filter="0123456789:"/>
 </fonts>

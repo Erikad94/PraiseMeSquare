@@ -96,15 +96,15 @@ class PraiseMeSquareView extends WatchUi.WatchFace {
             if (lines.size() == 1) 
             {
                 textOffsetTopLine = 25;
-                dc.drawText(centerX, centerY + textOffsetTopLine, wordFont, lines[0], Graphics.TEXT_JUSTIFY_CENTER);
+                dc.drawText(centerX, centerY + textOffsetTopLine, praiseFont, lines[0], Graphics.TEXT_JUSTIFY_CENTER);
             } 
             else if (lines.size() == 2) 
             {
                 textOffsetTopLine = 10;
                 textOffsetMidLine = 40;
 
-                dc.drawText(centerX, centerY + textOffsetTopLine, wordFont, lines[0], Graphics.TEXT_JUSTIFY_CENTER);
-                dc.drawText(centerX, centerY + textOffsetMidLine, wordFont, lines[1], Graphics.TEXT_JUSTIFY_CENTER);
+                dc.drawText(centerX, centerY + textOffsetTopLine, praiseFont, lines[0], Graphics.TEXT_JUSTIFY_CENTER);
+                dc.drawText(centerX, centerY + textOffsetMidLine, praiseFont, lines[1], Graphics.TEXT_JUSTIFY_CENTER);
             } 
             else if (lines.size() == 3) 
             {
@@ -113,9 +113,9 @@ class PraiseMeSquareView extends WatchUi.WatchFace {
                 textOffsetBottomLine = 50;
                 offsetTimeForPraise = 40;
 
-                dc.drawText(centerX, centerY + textOffsetTopLine, wordFont, lines[0], Graphics.TEXT_JUSTIFY_CENTER);
-                dc.drawText(centerX, centerY + textOffsetMidLine, wordFont, lines[1], Graphics.TEXT_JUSTIFY_CENTER);
-                dc.drawText(centerX, centerY + textOffsetBottomLine, wordFont, lines[2], Graphics.TEXT_JUSTIFY_CENTER);
+                dc.drawText(centerX, centerY + textOffsetTopLine, praiseFont, lines[0], Graphics.TEXT_JUSTIFY_CENTER);
+                dc.drawText(centerX, centerY + textOffsetMidLine, praiseFont, lines[1], Graphics.TEXT_JUSTIFY_CENTER);
+                dc.drawText(centerX, centerY + textOffsetBottomLine, praiseFont, lines[2], Graphics.TEXT_JUSTIFY_CENTER);
             }
         }
 
@@ -150,7 +150,7 @@ class PraiseMeSquareView extends WatchUi.WatchFace {
         var today = Time.Gregorian.info(Time.now(), Time.FORMAT_SHORT);
 
         dc.setColor(firstColor, Graphics.COLOR_TRANSPARENT);  
-        dc.drawText(centerX,30,wordFont,(weekdayArray[today.day_of_week]+" , "+ monthArray[today.month]+" "+ today.day +" " +today.year), Graphics.TEXT_JUSTIFY_CENTER );
+        dc.drawText(centerX,30,wordFont,(weekdayArray[today.day_of_week]+", "+ monthArray[today.month]+" "+ today.day +" " +today.year), Graphics.TEXT_JUSTIFY_CENTER );
     }
 
     private function SetTimeDisplay(dc as Dc, centerX as Number, centerY as Number, offsetForPraise as Number) 
